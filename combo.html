@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1d4ed8">
 <title>金庫與送金整合工具</title>
-<script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=CX3H2b6mZrD3itZWivOZxCcsEq18FOxbs4dECIkJzJXp9VspOcFSN_ZuW1EZuPxkZjNx2MTmtYVEW2j0kpiQU7XfNHrZAXu9O5U4UXpC0dMJc8yg7lP5i89i_OxhCWHUFXJw64UEqDOLabVqe-3_fjjklE7SSmPbYvs0sgrOJGXHmnjHLhyrLguxjcObETJeZaCcLcCNoYHtOI_bmTsDZaJl-yLRHuFzDgVlAsDm1IVCsWeJi_LYHKDZUR5lFT96lq2_tcpvOhJFElBOvUuTdcY2YsBJfibKB_Vbi647t_W-o8J1nPPOWONViJU2AzE8" charset="UTF-8"></script><style>
+<style>
 *{box-sizing:border-box}
 html{scroll-behavior:auto}
 body{margin:0;background:linear-gradient(150deg,#eef6ff,#f8f3ff);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;color:#10233f}
@@ -43,27 +43,79 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
   var frames={vault:document.getElementById('frame-vault'),remit:document.getElementById('frame-remit')};
   var loaded={vault:false,remit:false};
   var resizeObservers=[];
+  var activeSection=null;
+  var resizeQueued={vault:false,remit:false};
 
   function parseMoney(value){
     return Number(String(value||'').replace(/,/g,'').replace(/[^\d.-]/g,'')) || 0;
   }
 
-  function setFrameHeight(frame){
+  function normalizeEmbeddedPage(frame){
     try{
       var doc=frame.contentDocument;
-      if(!doc) return;
-      var body=doc.body, root=doc.documentElement;
-      var h=Math.max(body?body.scrollHeight:0,root?root.scrollHeight:0,body?body.offsetHeight:0,root?root.offsetHeight:0);
-      if(h>250) frame.style.height=(h+4)+'px';
+      if(!doc || doc.getElementById('combo-embed-fix')) return;
+      var style=doc.createElement('style');
+      style.id='combo-embed-fix';
+      style.textContent='html,body{min-height:0!important;}';
+      (doc.head||doc.documentElement).appendChild(style);
     }catch(e){}
   }
 
-  function observeFrame(frame){
+  function sectionY(name){
+    var target=document.getElementById(name);
+    var topbar=document.querySelector('.top');
+    if(!target) return 0;
+    var offset=(topbar ? topbar.offsetHeight : 0) + 6;
+    return Math.max(0,target.getBoundingClientRect().top + window.pageYOffset - offset);
+  }
+
+  function placeSection(name){
+    window.scrollTo(0,sectionY(name));
+  }
+
+  function setFrameHeight(name){
+    var frame=frames[name];
     try{
-      setFrameHeight(frame);
+      var doc=frame.contentDocument;
+      if(!doc) return;
+      normalizeEmbeddedPage(frame);
+      var body=doc.body, root=doc.documentElement;
+      var h=Math.max(
+        body?body.scrollHeight:0,
+        root?root.scrollHeight:0,
+        body?body.offsetHeight:0,
+        root?root.offsetHeight:0
+      );
+      if(h<=250) return;
+      var newHeight=h+4;
+      var oldHeight=parseFloat(frame.style.height)||frame.getBoundingClientRect().height||0;
+      if(Math.abs(newHeight-oldHeight)<3) return;
+      frame.style.height=newHeight+'px';
+
+      // 如果使用者正在看送金，上方金庫高度改變時立即補償位置，避免畫面被推動。
+      if(activeSection==='remit' && name==='vault'){
+        placeSection('remit');
+      }
+    }catch(e){}
+  }
+
+  function queueFrameHeight(name){
+    if(resizeQueued[name]) return;
+    resizeQueued[name]=true;
+    requestAnimationFrame(function(){
+      resizeQueued[name]=false;
+      setFrameHeight(name);
+    });
+  }
+
+  function observeFrame(name){
+    var frame=frames[name];
+    try{
+      normalizeEmbeddedPage(frame);
+      queueFrameHeight(name);
       var doc=frame.contentDocument;
       if(!doc || !window.ResizeObserver) return;
-      var ro=new ResizeObserver(function(){ requestAnimationFrame(function(){setFrameHeight(frame);}); });
+      var ro=new ResizeObserver(function(){ queueFrameHeight(name); });
       if(doc.documentElement) ro.observe(doc.documentElement);
       if(doc.body) ro.observe(doc.body);
       resizeObservers.push(ro);
@@ -116,6 +168,7 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
       if(frames.remit.contentWindow && typeof frames.remit.contentWindow.generateText==='function'){
         frames.remit.contentWindow.generateText();
       }
+      queueFrameHeight('remit');
     }catch(e){}
   }
 
@@ -142,6 +195,7 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
             input.addEventListener(ev,function(){
               updateRemitTodayAmount(remitDoc);
               if(frames.remit.contentWindow && typeof frames.remit.contentWindow.generateText==='function') frames.remit.contentWindow.generateText();
+              queueFrameHeight('remit');
             });
           });
         });
@@ -150,26 +204,9 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
     }catch(e){}
   }
 
-  var jumpTimers=[];
-  function clearJumpTimers(){
-    jumpTimers.forEach(function(t){clearTimeout(t);});
-    jumpTimers=[];
-  }
-
-  function jumpToSection(name, updateHash){
-    var target=document.getElementById(name);
-    var topbar=document.querySelector('.top');
-    if(!target) return;
-    function place(){
-      var offset=(topbar ? topbar.offsetHeight : 0) + 6;
-      var y=target.getBoundingClientRect().top + window.pageYOffset - offset;
-      window.scrollTo(0, Math.max(0,y));
-    }
-    clearJumpTimers();
-    place();
-    [80,220,500,1000,1800].forEach(function(delay){
-      jumpTimers.push(setTimeout(place,delay));
-    });
+  function jumpToSection(name,updateHash){
+    activeSection=name;
+    placeSection(name); // 只定位一次，不再用多個計時器反覆拉動畫面
     if(updateHash && history.replaceState){
       history.replaceState(null,'','#'+name);
     }
@@ -188,18 +225,24 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
       loaded[name]=true;
       var loading=document.getElementById('load-'+name);
       if(loading) loading.style.display='none';
-      observeFrame(frame);
+      normalizeEmbeddedPage(frame);
+      observeFrame(name);
       bindBridge();
-      if(location.hash==='#'+name) jumpToSection(name,false);
+      if(location.hash==='#'+name){
+        activeSection=name;
+        placeSection(name);
+      }
     });
   });
 
   if(location.hash==='#vault' || location.hash==='#remit'){
-    setTimeout(function(){jumpToSection(location.hash.slice(1),false);},0);
+    activeSection=location.hash.slice(1);
+    requestAnimationFrame(function(){placeSection(activeSection);});
   }
 
   window.addEventListener('resize',function(){
-    requestAnimationFrame(function(){setFrameHeight(frames.vault);setFrameHeight(frames.remit);});
+    queueFrameHeight('vault');
+    queueFrameHeight('remit');
   },{passive:true});
 })();
 </script>
