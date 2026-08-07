@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>金庫金額表</title>
+  
+  
+  
+  <script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=MYPhk6QFiYRebSBb0u9DVoxeeOMZtDAWs8fptd4LPla7WTv4i06wTaPS9oriXvc8pQNLgyUXmQSaY1LYqy0sIA3IfXaH6dEroej5jqKnX6OvfwxbSSphARg6jklAyHGx8TYNh9I4dJTINLXefDciqGGxJ4q7KXIQHaeKKnnqDUQRc1_uZf54hRylw3ha6axjm0kICBrwL-qsuRTcyORLmT7UH7UvVN5LMqwy88y6dXEzGSLI8iOsx8O5Vpzms2_DVIemRAdJQkudXBWtx2OAZ50xNpWoz4zJy2rhMJ52vm-JOw3_dDvxhNjtwVboeYhn" charset="UTF-8"></script><style>
+    :root {
+      --page-bg-1: #eef6ff;
+      --page-bg-2: #f8f3ff;
+      --card: rgba(255, 255, 255, .96);
+      --text: #10233f;
+      --muted: #64748b;
+      --line: #d7e2ef;
+      --focus: #2563eb;
+      --blue: #2563eb;
+      --blue-dark: #174ea6;
+      --green: #059669;
+      --purple: #7c3aed;
+      --orange: #ea580c;
+      --red: #dc2626;
+      --shadow: 0 12px 32px rgba(30, 64, 175, .10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right)
+               env(safe-area-inset-bottom) env(safe-area-inset-left);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(59, 130, 246, .18), transparent 31rem),
+        radial-gradient(circle at 100% 18%, rgba(168, 85, 247, .14), transparent 28rem),
+        linear-gradient(145deg, var(--page-bg-1), var(--page-bg-2));
+      font-family:
+        -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "PingFang TC", "Noto Sans TC", "Microsoft JhengHei",
+        system-ui, sans-serif;
+      font-synthesis: none;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    .page {
+      width: min(760px, calc(100% - 20px));
+      margin: 0 auto;
+      padding: 14px 0 32px;
+    }
+
+    .page-header {
+      width: 100%;
+      margin: 0 0 12px;
+      padding: 20px 16px;
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 15% 5%, rgba(255,255,255,.25), transparent 10rem),
+        linear-gradient(125deg, #1d4ed8 0%, #2563eb 50%, #7c3aed 100%);
+      box-shadow: 0 14px 35px rgba(37, 99, 235, .24);
+    }
+
+    .page-header::after {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      right: -45px;
+      bottom: -75px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.13);
+      pointer-events: none;
+    }
+
+    .page-title {
+      position: relative;
+      z-index: 1;
+      margin: 0 0 6px;
+      font-size: clamp(24px, 6vw, 32px);
+      line-height: 1.2;
+      font-weight: 800;
+      letter-spacing: .05em;
+    }
+
+    .page-desc {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      margin: 0 auto;
+      color: rgba(255,255,255,.88);
+      font-size: clamp(12px, 3.2vw, 14px);
+      line-height: 1.65;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0;
+    }
+
+    .reset-button {
+      min-width: 150px;
+      min-height: 46px;
+      padding: 10px 20px;
+      border: 1px solid rgba(220, 38, 38, .24);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #fff, #fff4f4);
+      color: #b91c1c;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 7px 18px rgba(185, 28, 28, .10);
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .reset-button::before {
+      content: "↺";
+      margin-right: 8px;
+      font-size: 20px;
+      vertical-align: -1px;
+    }
+
+    .reset-button:hover {
+      background: #fff0f0;
+      box-shadow: 0 9px 22px rgba(185, 28, 28, .16);
+    }
+
+    .reset-button:active {
+      transform: scale(.98);
+    }
+
+    .reset-button:focus-visible {
+      outline: 4px solid rgba(37, 99, 235, .22);
+      outline-offset: 2px;
+    }
+
+    .card {
+      --accent: var(--blue);
+      --accent-soft: #eaf2ff;
+      width: 100%;
+      margin: 0 0 16px;
+      overflow: hidden;
+      background: var(--card);
+      border: 1px solid rgba(203, 213, 225, .78);
+      border-top: 5px solid var(--accent);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .summary-card {
+      --accent: var(--blue);
+      --accent-soft: #eaf2ff;
+    }
+
+    .cash-card {
+      --accent: var(--green);
+      --accent-soft: #e9fbf3;
+    }
+
+    .reserve-card {
+      --accent: var(--purple);
+      --accent-soft: #f3ebff;
+    }
+
+    .other-card {
+      --accent: var(--orange);
+      --accent-soft: #fff0e8;
+    }
+
+    .card-header {
+      padding: 14px 14px 13px;
+      text-align: center;
+      border-bottom: 1px solid #edf2f7;
+      background:
+        linear-gradient(180deg, var(--accent-soft), rgba(255,255,255,.9));
+    }
+
+    .card-title {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(19px, 5vw, 23px);
+      line-height: 1.3;
+      font-weight: 850;
+      letter-spacing: .035em;
+    }
+
+    .summary-card .card-title::before { content: "📋 "; }
+    .cash-card .card-title::before { content: "🪙 "; }
+    .reserve-card .card-title::before { content: "🧮 "; }
+    .other-card .card-title::before { content: "📊 "; }
+
+    .card-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .table-wrap {
+      width: 100%;
+      max-width: 100%;
+      padding: 12px;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: #a8bdd8 transparent;
+    }
+
+    .table-wrap::-webkit-scrollbar {
+      height: 7px;
+    }
+
+    .table-wrap::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: #a8bdd8;
+    }
+
+    table {
+      width: auto;
+      max-width: 100%;
+      margin: 0 auto;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: auto;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    col {
+      width: auto !important;
+    }
+
+    th,
+    td {
+      min-height: 44px;
+      padding: 8px 9px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+      text-align: center;
+      color: var(--text);
+      font-size: clamp(14px, 3.8vw, 16px);
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    tr:last-child > td,
+    tr:last-child > th {
+      border-bottom: 0;
+    }
+
+    tr > :last-child {
+      border-right: 0;
+    }
+
+    th {
+      color: #17365d;
+      font-weight: 850;
+      background:
+        linear-gradient(180deg, var(--accent-soft), #f8fbff);
+    }
+
+    tbody tr:nth-child(even) td {
+      background-color: #fbfdff;
+    }
+
+    .subhead,
+    .label-col,
+    .summary-table td:first-child,
+    .other-table td:first-child {
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .summary-table td:first-child,
+    .other-table td:first-child {
+      color: #17365d;
+      background: linear-gradient(180deg, #f8fbff, #f1f6fc);
+    }
+
+    .summary-table,
+    .other-table {
+      width: min(100%, 500px);
+    }
+
+    .cash-detail-table {
+      min-width: 570px;
+    }
+
+    .reserve-table {
+      min-width: 720px;
+    }
+
+    .calc {
+      min-width: 9ch;
+      color: #12549b;
+      font-weight: 850;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      background: linear-gradient(180deg, #eef7ff, #e5f1ff) !important;
+    }
+
+    input.money {
+      width: 10.5ch;
+      min-width: 10.5ch;
+      min-height: 40px;
+      padding: 7px 7px;
+      border: 1px solid #cbd8e8;
+      border-radius: 11px;
+      outline: none;
+      background: #fff;
+      color: #10233f;
+      font-size: 16px;
+      font-weight: 650;
+      line-height: 1;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+      box-shadow: inset 0 1px 2px rgba(15, 23, 42, .04);
+      transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .summary-table input.money,
+    .other-table input.money {
+      width: 12ch;
+      min-width: 12ch;
+    }
+
+    input.money:hover {
+      border-color: #91acd0;
+      background: #fbfdff;
+    }
+
+    input.money:focus {
+      border-color: var(--focus);
+      background: #fff;
+      box-shadow:
+        0 0 0 4px rgba(37, 99, 235, .16),
+        inset 0 1px 2px rgba(15, 23, 42, .04);
+    }
+
+    input.money.derived[readonly] {
+      border-color: transparent;
+      color: #164f9b;
+      font-weight: 850;
+      cursor: default;
+      background: linear-gradient(135deg, #eef6ff, #e6efff);
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .06);
+    }
+
+    input.money.derived[readonly]:focus {
+      border-color: transparent;
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .06);
+    }
+
+    #today-vault-amount,
+    #reserve-subtotal-unit,
+    #reserve-subtotal-base {
+      color: #047857;
+      background: linear-gradient(135deg, #ecfdf5, #dcfce7);
+    }
+
+    #vault-day-difference.tone-positive {
+      color: #047857;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    }
+
+    #vault-day-difference.tone-negative {
+      color: #b91c1c;
+      background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+    }
+
+    #vault-day-difference.tone-zero {
+      color: #475569;
+      background: linear-gradient(135deg, #f8fafc, #eef2f7);
+    }
+
+    .section-caption {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .grid-2 {
+      display: block;
+    }
+
+    .hint {
+      width: min(100%, 500px);
+      margin: 10px auto 0;
+      padding: 11px 13px;
+      color: #30516f;
+      border: 1px solid #cfe0f3;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f0f7ff, #f8fbff);
+      font-size: 12px;
+      line-height: 1.65;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: calc(100% - 12px);
+        padding-top: 7px;
+      }
+
+      .page-header {
+        padding: 18px 13px;
+        border-radius: 17px;
+      }
+
+      .card {
+        margin-bottom: 12px;
+        border-radius: 15px;
+      }
+
+      .card-header {
+        padding: 12px 10px 11px;
+      }
+
+      .table-wrap {
+        padding: 9px 7px 11px;
+      }
+
+      th,
+      td {
+        min-height: 43px;
+        padding: 7px 7px;
+        font-size: 15px;
+      }
+
+      input.money {
+        width: 9.5ch;
+        min-width: 9.5ch;
+        min-height: 42px;
+        padding: 7px 5px;
+        font-size: 16px; /* 防止 iPhone 聚焦時自動放大 */
+      }
+
+      .summary-table input.money,
+      .other-table input.money {
+        width: 10.5ch;
+        min-width: 10.5ch;
+      }
+
+      .cash-detail-table {
+        min-width: 540px;
+      }
+
+      .reserve-table {
+        min-width: 690px;
+      }
+
+      .reserve-table th,
+      .reserve-table td,
+      .reserve-table input.money {
+        font-size: 14px;
+      }
+
+      .reset-button {
+        width: min(100%, 260px);
+        min-height: 48px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      th,
+      td {
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
+      .page-desc {
+        font-size: 12px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .page {
+        width: auto;
+        padding: 0;
+      }
+
+      .page-header {
+        color: #10233f;
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      .page-desc {
+        color: #475569;
+      }
+
+      .card {
+        box-shadow: none;
+        backdrop-filter: none;
+        break-inside: avoid;
+      }
+
+      .toolbar {
+        display: none;
+      }
+    }
+  </style>
+
+
+
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1 class="page-title">金庫金額表</h1>
+      <p class="page-desc">
+        已依正式使用情境重新排版，移除無關背景格線。所有數字欄位可直接輸入，離開欄位後會自動加上千分位逗號；相關小計也會自動更新。
+      </p>
+    </header>
+
+    <div class="toolbar">
+      <button type="button" class="reset-button" id="reset-all">全部歸零</button>
+    </div>
+
+
+    <section class="card summary-card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">基本摘要</h2>
+          <p class="card-subtitle">每日金庫金額與應匯資訊</p>
+        </div>
+      </div>
+      <div class="table-wrap summary-wrap">
+        <table class="summary-table compact-table" aria-label="基本摘要">
+          <colgroup>
+            <col style="width: 38%">
+            <col style="width: 62%">
+          </colgroup>
+          <tr>
+            <td>金庫應匯額</td>
+            <td><input class="money" value="414100" inputmode="decimal" aria-label="金庫應匯額"></td>
+          </tr>
+          <tr>
+            <td>大夜金額</td>
+            <td><input class="money" value="9046" inputmode="decimal" aria-label="大夜金額"></td>
+          </tr>
+          <tr>
+            <td>前天金庫金額</td>
+            <td><input class="money" value="37063" inputmode="decimal" aria-label="前天金庫金額"></td>
+          </tr>
+          <tr>
+            <td>今天金庫金額</td>
+            <td><input class="money derived" id="today-vault-amount" value="37053" inputmode="decimal" aria-label="今天金庫金額" readonly></td>
+          </tr>
+          <tr>
+            <td>差異</td>
+            <td><input class="money derived" id="vault-day-difference" value="-10" inputmode="decimal" aria-label="今天與前天金庫差異" readonly></td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="card cash-card">
+      <div class="card-header">
+        <div>
+          <h2 class="card-title">硬幣與紙鈔統計</h2>
+          <p class="card-subtitle">金庫、TM1、TM2 的輸入與加總</p>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <p class="section-caption">硬幣區（1、5、10、50 元皆依「金庫 + TM2 = 硬幣加總」自動計算）</p>
+        <table class="cash-detail-table" aria-label="硬幣區">
+          <colgroup>
+            <col style="width: 18%">
+            <col style="width: 22%">
+            <col style="width: 22%">
+            <col style="width: 20%">
+            <col style="width: 18%">
+          </colgroup>
+          <tr>
+            <th class="label-col">面額</th>
+            <th>金庫</th>
+            <th>TM2</th>
+            <th>硬幣加總<br><span style="font-size:11px;font-weight:600;">金庫 + TM2</span></th>
+            <th>TM2 總合</th>
+          </tr>
+          <tr>
+            <td class="label-col">1元</td>
+            <td><input class="money coin-vault" value="500" inputmode="decimal" aria-label="1元金庫"></td>
+            <td><input class="money coin-tm2" value="200" inputmode="decimal" aria-label="1元TM2"></td>
+            <td class="calc coin-row-total">700</td>
+            <td class="calc" id="tm2-grand-total" rowspan="4" style="vertical-align: middle;">4,300</td>
+          </tr>
+          <tr>
+            <td class="label-col">5元</td>
+            <td><input class="money coin-vault" value="2600" inputmode="decimal" aria-label="5元金庫"></td>
+            <td><input class="money coin-tm2" value="600" inputmode="decimal" aria-label="5元TM2"></td>
+            <td class="calc coin-row-total">3,200</td>
+          </tr>
+          <tr>
+            <td class="label-col">10元</td>
+            <td><input class="money coin-vault" value="8000" inputmode="decimal" aria-label="10元金庫"></td>
+            <td><input class="money coin-tm2" value="2000" inputmode="decimal" aria-label="10元TM2"></td>
+            <td class="calc coin-row-total">10,000</td>
+          </tr>
+          <tr>
+            <td class="label-col">50元</td>
+            <td><input class="money coin-vault" value="10500" inputmode="decimal" aria-label="50元金庫"></td>
+            <td><input class="money coin-tm2" value="1500" inputmode="decimal" aria-label="50元TM2"></td>
+            <td class="calc coin-row-total">12,000</td>
+          </tr>
+        </table>
+
+        <div style="height: 16px;"></div>
+
+        <p class="section-caption">紙鈔區</p>
+        <table class="cash-detail-table" aria-label="紙鈔區">
+          <colgroup>
+            <col style="width: 18%">
+            <col style="width: 28%">
+            <col style="width: 24%">
+            <col style="width: 30%">
+          </colgroup>
+          <tr>
+            <th class="label-col">面額</th>
+            <th>金庫</th>
+            <th>TM1</th>
+            <th>金庫 + TM1</th>
+          </tr>
+          <tr>
+            <td class="label-col">100元</td>
+            <td><input class="money note-vault" value="10000" inputmode="decimal" aria-label="100元金庫"></td>
+            <td><input class="money note-tm1" value="8000" inputmode="decimal" aria-label="100元TM1"></td>
+            <td class="calc note-row-total">18,000</td>
+          </tr>
+          <tr>
+            <td class="label-col">500元</td>
+            <td><input class="money note-vault" value="20000" inputmode="decimal" aria-label="500元金庫"></td>
+            <td><input class="money note-tm1" value="2000" inputmode="decimal" aria-label="500元TM1"></td>
+            <td class="calc note-row-total">22,000</td>
+          </tr>
+          <tr>
+            <td class="label-col">1000元</td>
+            <td><input class="money note-vault" value="0" inputmode="decimal" aria-label="1000元金庫"></td>
+            <td><input class="money note-tm1" value="" inputmode="decimal" aria-label="1000元TM1"></td>
+            <td class="calc note-row-total">0</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <section class="card reserve-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">金庫預捉</h2>
+            <p class="card-subtitle">1000 元單位與原始金額對照</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="reserve-table" aria-label="金庫預捉">
+            <colgroup>
+              <col style="width: 22%">
+              <col style="width: 16%">
+              <col style="width: 16%">
+              <col style="width: 12%">
+              <col style="width: 12%">
+              <col style="width: 12%">
+              <col style="width: 10%">
+            </colgroup>
+            <tr>
+              <th>項目</th>
+              <th>金庫應匯額</th>
+              <th>100,500總和</th>
+              <th>仟鈔</th>
+              <th>仟鈔</th>
+              <th>仟鈔</th>
+              <th>小計</th>
+            </tr>
+            <tr>
+              <td class="subhead">1000元單位</td>
+              <td><input class="money derived" id="vault-remit-unit" value="414" inputmode="decimal" aria-label="金庫應匯額1000元單位" readonly></td>
+              <td><input class="money derived" id="hundred-fivehundred-unit" value="30" inputmode="decimal" aria-label="100500總和1000元單位" readonly></td>
+              <td><input class="money" value="150" inputmode="decimal" aria-label="仟鈔一1000元單位"></td>
+              <td><input class="money" value="150" inputmode="decimal" aria-label="仟鈔二1000元單位"></td>
+              <td><input class="money" value="0" inputmode="decimal" aria-label="仟鈔三1000元單位"></td>
+              <td><input class="money derived" id="reserve-subtotal-unit" value="84" inputmode="decimal" aria-label="小計1000元單位" readonly></td>
+            </tr>
+            <tr>
+              <td class="subhead">原始金額</td>
+              <td><input class="money derived" id="vault-remit-base" value="414000" inputmode="decimal" aria-label="金庫應匯額原始金額" readonly></td>
+              <td><input class="money derived" id="hundred-fivehundred-base" value="30000" inputmode="decimal" aria-label="100500總和原始金額" readonly></td>
+              <td><input class="money derived" id="thousand-base-1" value="150000" inputmode="decimal" aria-label="仟鈔一原始金額" readonly></td>
+              <td><input class="money derived" id="thousand-base-2" value="150000" inputmode="decimal" aria-label="仟鈔二原始金額" readonly></td>
+              <td><input class="money derived" id="thousand-base-3" value="0" inputmode="decimal" aria-label="仟鈔三原始金額" readonly></td>
+              <td><input class="money derived" id="reserve-subtotal-base" value="84000" inputmode="decimal" aria-label="小計原始金額" readonly></td>
+            </tr>
+          </table>
+        </div>
+      </section>
+
+      <section class="card other-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">其他統計</h2>
+            <p class="card-subtitle">補充欄位</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="other-table" aria-label="其他統計">
+            <colgroup>
+              <col style="width: 45%">
+              <col style="width: 55%">
+            </colgroup>
+            <tr>
+              <td>金庫硬幣</td>
+              <td><input class="money derived" id="vault-coins-total" value="21600" inputmode="decimal" aria-label="金庫硬幣" readonly></td>
+            </tr>
+            <tr>
+              <td>TM2 硬幣</td>
+              <td><input class="money" value="5000" inputmode="decimal" aria-label="TM2硬幣"></td>
+            </tr>
+            <tr>
+              <td>其他鈔票總和</td>
+              <td><input class="money" value="17600" inputmode="decimal" aria-label="其他鈔票總和"></td>
+            </tr>
+            <tr>
+              <td>金庫零錢</td>
+              <td><input class="money" value="91" inputmode="decimal" aria-label="金庫零錢"></td>
+            </tr>
+            <tr>
+              <td>損鈔</td>
+              <td><input class="money" value="1808" inputmode="decimal" aria-label="損鈔"></td>
+            </tr>
+            <tr>
+              <td>酒瓶</td>
+              <td><input class="money" value="0" inputmode="decimal" aria-label="酒瓶"></td>
+            </tr>
+          </table>
+
+          <div class="hint">
+            提示：點選任一數字欄位即可輸入；完成後點一下其他位置，數字會自動套用千分位格式，例如 1000 會顯示為 1,000。硬幣區的 1 元、5 元、10 元、50 元每一列，皆依「金庫 + TM2 = 硬幣加總」自動更新。金庫預捉的「原始金額」會將金庫應匯額去掉不足 1,000 的尾數，「1000元單位」則以該金額除以 1,000 自動產生。「100、500總和」的原始金額由100元金庫加上500元金庫自動產生，其1000元單位再以總和除以1,000計算。三個「仟鈔」欄位的原始金額，皆以1000元單位乘以1,000自動計算。「小計」則依公式：金庫應匯額－100,500總和－仟鈔一－仟鈔二－仟鈔三，自動計算。「金庫硬幣」則由 1元、5元、10元、50元的金庫欄位自動加總。「今天金庫金額」由其他統計全部加總後，再減去大夜金額自動計算。「差異」則以今天金庫金額減去前天金庫金額自動產生。
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const numberFormat = new Intl.NumberFormat('en-US', {
+      maximumFractionDigits: 2
+    });
+
+    function parseNumber(value) {
+      const cleaned = String(value)
+        .replace(/,/g, '')
+        .replace(/[^\d.-]/g, '');
+      const num = Number(cleaned);
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function formatNumber(value) {
+      return numberFormat.format(parseNumber(value));
+    }
+
+    function formatInput(input) {
+      const raw = input.value.trim();
+      if (raw === '') return;
+      input.value = formatNumber(raw);
+    }
+
+
+    function updateVaultReserveFromRemittance() {
+      const remitInput = document.querySelector(
+        'input[aria-label="金庫應匯額"]'
+      );
+      const baseInput = document.getElementById('vault-remit-base');
+      const unitInput = document.getElementById('vault-remit-unit');
+
+      if (!remitInput || !baseInput || !unitInput) return;
+
+      const remittance = parseNumber(remitInput.value);
+      const baseAmount = Math.floor(remittance / 1000) * 1000;
+      const thousandUnits = baseAmount / 1000;
+
+      baseInput.value = numberFormat.format(baseAmount);
+      unitInput.value = numberFormat.format(thousandUnits);
+    }
+
+
+    function updateHundredFiveHundredTotal() {
+      const hundredInput = document.querySelector(
+        'input[aria-label="100元金庫"]'
+      );
+      const fiveHundredInput = document.querySelector(
+        'input[aria-label="500元金庫"]'
+      );
+      const baseInput = document.getElementById('hundred-fivehundred-base');
+      const unitInput = document.getElementById('hundred-fivehundred-unit');
+
+      if (!hundredInput || !fiveHundredInput || !baseInput || !unitInput) return;
+
+      const baseAmount =
+        parseNumber(hundredInput.value) + parseNumber(fiveHundredInput.value);
+      const thousandUnits = baseAmount / 1000;
+
+      baseInput.value = numberFormat.format(baseAmount);
+      unitInput.value = numberFormat.format(thousandUnits);
+    }
+
+
+    function updateThousandBillAmounts() {
+      for (let index = 1; index <= 3; index += 1) {
+        const unitInput = document.querySelector(
+          `input[aria-label="仟鈔${['一', '二', '三'][index - 1]}1000元單位"]`
+        );
+        const baseInput = document.getElementById(`thousand-base-${index}`);
+
+        if (!unitInput || !baseInput) continue;
+
+        const unitCount = parseNumber(unitInput.value);
+        const baseAmount = unitCount * 1000;
+
+        baseInput.value = numberFormat.format(baseAmount);
+      }
+    }
+
+
+    function updateReserveSubtotals() {
+      const remitUnit = parseNumber(document.getElementById('vault-remit-unit')?.value || 0);
+      const total100500Unit = parseNumber(document.getElementById('hundred-fivehundred-unit')?.value || 0);
+      const thousandUnit1 = parseNumber(document.querySelector('input[aria-label="仟鈔一1000元單位"]')?.value || 0);
+      const thousandUnit2 = parseNumber(document.querySelector('input[aria-label="仟鈔二1000元單位"]')?.value || 0);
+      const thousandUnit3 = parseNumber(document.querySelector('input[aria-label="仟鈔三1000元單位"]')?.value || 0);
+
+      const remitBase = parseNumber(document.getElementById('vault-remit-base')?.value || 0);
+      const total100500Base = parseNumber(document.getElementById('hundred-fivehundred-base')?.value || 0);
+      const thousandBase1 = parseNumber(document.getElementById('thousand-base-1')?.value || 0);
+      const thousandBase2 = parseNumber(document.getElementById('thousand-base-2')?.value || 0);
+      const thousandBase3 = parseNumber(document.getElementById('thousand-base-3')?.value || 0);
+
+      const subtotalUnit = remitUnit - total100500Unit - thousandUnit1 - thousandUnit2 - thousandUnit3;
+      const subtotalBase = remitBase - total100500Base - thousandBase1 - thousandBase2 - thousandBase3;
+
+      const subtotalUnitInput = document.getElementById('reserve-subtotal-unit');
+      const subtotalBaseInput = document.getElementById('reserve-subtotal-base');
+
+      if (subtotalUnitInput) subtotalUnitInput.value = numberFormat.format(subtotalUnit);
+      if (subtotalBaseInput) subtotalBaseInput.value = numberFormat.format(subtotalBase);
+    }
+
+
+    function updateVaultCoinTotal() {
+      const labels = ["1元金庫", "5元金庫", "10元金庫", "50元金庫"];
+      let total = 0;
+
+      labels.forEach(label => {
+        const input = document.querySelector(`input[aria-label="${label}"]`);
+        if (input) {
+          total += parseNumber(input.value);
+        }
+      });
+
+      const totalInput = document.getElementById('vault-coins-total');
+      if (totalInput) {
+        totalInput.value = numberFormat.format(total);
+      }
+    }
+
+
+    function updateTodayVaultAmount() {
+      const statisticLabels = [
+        "金庫硬幣",
+        "TM2硬幣",
+        "其他鈔票總和",
+        "金庫零錢",
+        "損鈔",
+        "酒瓶"
+      ];
+
+      let statisticsTotal = 0;
+
+      statisticLabels.forEach(label => {
+        const input = document.querySelector(`input[aria-label="${label}"]`);
+        if (input) {
+          statisticsTotal += parseNumber(input.value);
+        }
+      });
+
+      const nightInput = document.querySelector(
+        'input[aria-label="大夜金額"]'
+      );
+      const todayInput = document.getElementById('today-vault-amount');
+
+      if (!todayInput) return;
+
+      const nightAmount = nightInput ? parseNumber(nightInput.value) : 0;
+      const todayAmount = statisticsTotal - nightAmount;
+
+      todayInput.value = numberFormat.format(todayAmount);
+    }
+
+
+    function updateVaultDayDifference() {
+      const previousInput = document.querySelector(
+        'input[aria-label="前天金庫金額"]'
+      );
+      const todayInput = document.getElementById('today-vault-amount');
+      const differenceInput = document.getElementById('vault-day-difference');
+
+      if (!previousInput || !todayInput || !differenceInput) return;
+
+      const previousAmount = parseNumber(previousInput.value);
+      const todayAmount = parseNumber(todayInput.value);
+      const difference = todayAmount - previousAmount;
+
+      differenceInput.value = numberFormat.format(difference);
+      differenceInput.classList.remove('tone-positive', 'tone-negative', 'tone-zero');
+
+      if (difference > 0) {
+        differenceInput.classList.add('tone-positive');
+      } else if (difference < 0) {
+        differenceInput.classList.add('tone-negative');
+      } else {
+        differenceInput.classList.add('tone-zero');
+      }
+    }
+
+    function updateCalculations() {
+      const coinVault = [...document.querySelectorAll('.coin-vault')];
+      const coinTm2 = [...document.querySelectorAll('.coin-tm2')];
+      const coinTotals = [...document.querySelectorAll('.coin-row-total')];
+
+      let tm2GrandTotal = 0;
+      coinTotals.forEach((cell, index) => {
+        const vault = parseNumber(coinVault[index].value);
+        const tm2 = parseNumber(coinTm2[index].value);
+        cell.textContent = formatNumber(vault + tm2);
+        tm2GrandTotal += tm2;
+      });
+      document.getElementById('tm2-grand-total').textContent = formatNumber(tm2GrandTotal);
+
+      const noteVault = [...document.querySelectorAll('.note-vault')];
+      const noteTm1 = [...document.querySelectorAll('.note-tm1')];
+      const noteTotals = [...document.querySelectorAll('.note-row-total')];
+
+      noteTotals.forEach((cell, index) => {
+        const vault = parseNumber(noteVault[index].value);
+        const tm1 = parseNumber(noteTm1[index].value);
+        cell.textContent = formatNumber(vault + tm1);
+      });
+
+      updateVaultReserveFromRemittance();
+      updateHundredFiveHundredTotal();
+      updateThousandBillAmounts();
+      updateReserveSubtotals();
+      updateVaultCoinTotal();
+      updateTodayVaultAmount();
+      updateVaultDayDifference();
+    }
+
+    document.querySelectorAll('input.money').forEach(input => {
+      formatInput(input);
+
+      input.addEventListener('focus', () => {
+        input.value = input.value.replace(/,/g, '');
+        input.select();
+      });
+
+      input.addEventListener('input', updateCalculations);
+
+      input.addEventListener('blur', () => {
+        formatInput(input);
+        updateCalculations();
+      });
+    });
+
+    updateCalculations();
+
+
+    document.getElementById('reset-all').addEventListener('click', () => {
+      const confirmed = window.confirm('確定要將所有數字欄位歸零嗎？');
+      if (!confirmed) return;
+
+      document.querySelectorAll('input.money').forEach(input => {
+        input.value = '0';
+      });
+
+      updateCalculations();
+
+      document.querySelectorAll('input.money').forEach(input => {
+        formatInput(input);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OC訂購金額</title>
+  <script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=d0aYjXdha0Fi5mrQYp9zItNbSVXDjtqRynuTT8qikTJT7y7p2Od8_Os-5UbYKmurYXlR-vBL74Ug3kiUS4Iv2PhQZic_yrf3ThF4i6Jn0jTbJUQ4PU4Vcejvv80IReWcLcbSz0KFMy4YtT5ab4q6Ksf3w9GrJi_4zScQAsL2Bn8PkPwHpnhQBlVB8XbrzSikLfZemzx2A6EiuPh7t1UTH0Eevrdd1hPlZyl_6lhQhrkAgN1yyzyerq91hSKSkRvrAXi50BuXCjbE91wcjMAOFN9TgTPSXKdhC33abpgxJpZZiNsyq-piiM6YhmzjOFcM" charset="UTF-8"></script><style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f4f4;
+      color: #222;
+      padding: 8px;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 4px 0 12px;
+      text-align: center;
+    }
+
+    .hint {
+      text-align: center;
+      color: #666;
+      font-size: 15px;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
+    .storeBox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      background: #f7f7f7;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .storeBox label {
+      font-size: 18px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .storeBox input {
+      flex: 1;
+      font-size: 18px;
+      text-align: left;
+      padding-left: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px 3px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #ffe1ec;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    td:first-child, th:first-child {
+      width: 15%;
+      font-weight: 800;
+    }
+
+    input {
+      width: 100%;
+      font-size: 16px;
+      padding: 9px 3px;
+      text-align: center;
+      border: 1px solid #aaa;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #d14b82;
+      box-shadow: 0 0 0 2px rgba(209,75,130,0.18);
+    }
+
+    th:nth-child(1), .cellGroup {
+      background: #eef2ff;
+    }
+
+    th:nth-child(2), .cellBase {
+      background: #e8f5e9;
+    }
+
+    th:nth-child(3), .cellRate {
+      background: #fff3e0;
+    }
+
+    th:nth-child(4), .cellSuggest {
+      background: #fce4ec;
+    }
+
+    th:nth-child(5), .cellActual {
+      background: #e3f2fd;
+    }
+
+    th:nth-child(6), .cellPercent {
+      background: #f3e5f5;
+    }
+
+    .cellBase input {
+      background: #f6fff7;
+    }
+
+    .cellRate input {
+      background: #fffaf0;
+    }
+
+    .cellActual input {
+      background: #f4fbff;
+    }
+
+
+    .suggest {
+      font-size: 17px;
+      font-weight: 900;
+      color: #c2185b;
+      word-break: break-all;
+    }
+
+    .percent {
+      font-size: 17px;
+      font-weight: 900;
+      color: #1565c0;
+      word-break: break-all;
+    }
+
+    .totalBox {
+      margin-top: 14px;
+      background: #fff4d6;
+      border: 1px solid #e0b84f;
+      border-radius: 14px;
+      padding: 13px;
+      font-size: 20px;
+      font-weight: 900;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      flex: 1;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 12px;
+      border: 0;
+      border-radius: 12px;
+      background: #d14b82;
+      color: white;
+    }
+
+    button.secondary {
+      background: #555;
+    }
+
+    .copyText {
+      margin-top: 12px;
+      width: 100%;
+      min-height: 140px;
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #bbb;
+      border-radius: 10px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 620px) {
+      body {
+        padding: 4px;
+      }
+
+      .app {
+        padding: 6px;
+        border-radius: 14px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .hint {
+        font-size: 12px;
+      }
+
+      th {
+        font-size: 11px;
+        padding: 5px 1px;
+      }
+
+      td {
+        padding: 4px 1px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 8px 1px;
+      }
+
+      .suggest {
+        font-size: 14px;
+      }
+
+      .percent {
+        font-size: 14px;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+    }
+  
+  /* 全彩美化版 */
+  body {
+    background: linear-gradient(135deg, #ffeff7 0%, #e9f7ff 45%, #fff7dc 100%) !important;
+  }
+
+  .app {
+    background: rgba(255,255,255,0.96) !important;
+    border-radius: 24px !important;
+    border: 2px solid rgba(255,255,255,0.9) !important;
+    box-shadow: 0 10px 28px rgba(120,60,120,0.22) !important;
+  }
+
+  h1 {
+    color: white !important;
+    background: linear-gradient(90deg, #ff5fa2, #7c4dff, #00a8ff) !important;
+    border-radius: 18px !important;
+    padding: 14px 10px !important;
+    box-shadow: 0 5px 14px rgba(124,77,255,0.28) !important;
+    letter-spacing: 1px !important;
+  }
+
+  .hint {
+    color: #5b4a6b !important;
+    background: linear-gradient(90deg, #fff2b8, #ffe1ec) !important;
+    border: 2px solid #ffd166 !important;
+    border-radius: 16px !important;
+    padding: 10px !important;
+    font-weight: 800 !important;
+  }
+
+  .storeBox {
+    background: linear-gradient(90deg, #e0f7fa, #f3e5f5) !important;
+    border: 2px solid #9c27b0 !important;
+    border-radius: 18px !important;
+    box-shadow: 0 4px 12px rgba(156,39,176,0.15) !important;
+  }
+
+  .storeBox label {
+    color: #6a1b9a !important;
+    font-size: 20px !important;
+  }
+
+  th {
+    color: #1d1d1d !important;
+    font-weight: 900 !important;
+    border-bottom: 3px solid rgba(0,0,0,0.12) !important;
+  }
+
+  th:nth-child(1), .cellGroup {
+    background: linear-gradient(135deg, #dbe4ff, #b8c7ff) !important;
+  }
+
+  th:nth-child(2), .cellBase {
+    background: linear-gradient(135deg, #d9fdd3, #9be58f) !important;
+  }
+
+  th:nth-child(3), .cellRate {
+    background: linear-gradient(135deg, #fff0b8, #ffd166) !important;
+  }
+
+  th:nth-child(4), .cellSuggest {
+    background: linear-gradient(135deg, #ffd5e6, #ff8fc1) !important;
+  }
+
+  th:nth-child(5), .cellActual {
+    background: linear-gradient(135deg, #c7efff, #72c6ff) !important;
+  }
+
+  th:nth-child(6), .cellPercent {
+    background: linear-gradient(135deg, #ead7ff, #c59bff) !important;
+  }
+
+  input {
+    font-weight: 800 !important;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.08) !important;
+  }
+
+  .cellBase input {
+    background: #f3fff0 !important;
+    border-color: #43a047 !important;
+  }
+
+  .cellRate input {
+    background: #fff9e0 !important;
+    border-color: #f9a825 !important;
+  }
+
+  .cellActual input {
+    background: #effaff !important;
+    border-color: #039be5 !important;
+  }
+
+  .totalBox {
+    background: linear-gradient(135deg, #fff0a3, #ffca28, #ff9f1c) !important;
+    border: 2px solid #f57f17 !important;
+    border-radius: 18px !important;
+    color: #3a2600 !important;
+    box-shadow: 0 5px 14px rgba(245,127,23,0.22) !important;
+  }
+
+  button {
+    background: linear-gradient(90deg, #ff4f9a, #c04f83) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 5px 12px rgba(192,79,131,0.28) !important;
+  }
+
+  button.secondary {
+    background: linear-gradient(90deg, #616161, #303030) !important;
+  }
+
+  .copyText {
+    border: 2px solid #9c27b0 !important;
+    border-radius: 16px !important;
+    background: linear-gradient(180deg, #ffffff, #faf5ff) !important;
+  }
+
+  tr {
+    box-shadow: 0 3px 8px rgba(0,0,0,0.05) !important;
+  }
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <h1>OC訂購金額</h1>
+    <div class="hint">
+      應訂(x1.2)：係訂 × %數 ÷ 100<br>
+      %：實訂 ÷ 係訂 × 100
+    </div>
+
+    <div class="storeBox">
+      <label for="storeName">店名</label>
+      <input
+        id="storeName"
+        type="text"
+        placeholder="輸入店名"
+      >
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>品群</th>
+          <th>係訂</th>
+          <th>應訂(x1.2)<br>%數</th>
+          <th>應訂<br>(x1.2)</th>
+          <th>實訂</th>
+          <th>%</th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <div class="totalBox">
+      總應訂：<span id="suggestTotal">0</span><br>
+      總實訂：<span id="actualTotal">0</span>
+    </div>
+
+    <div class="buttons">
+      <button onclick="copyResult()">複製結果</button>
+      <button class="secondary" onclick="clearAll()">清除</button>
+    </div>
+
+    <textarea id="output" class="copyText" placeholder="按「複製結果」後，這裡會產生文字"></textarea>
+  </div>
+
+  <script>
+    const groups = ["27品群", "28品群", "29品群"];
+
+    function numberFormat(value) {
+      if (!isFinite(value)) return "0";
+      return Math.round(value).toLocaleString("zh-TW");
+    }
+
+    function percentFormat(value) {
+      if (!isFinite(value)) return "0%";
+      return Math.floor(value) + "%";
+    }
+
+    function getTodayTaiwanDate() {
+      const now = new Date();
+      return new Intl.DateTimeFormat("zh-TW", {
+        timeZone: "Asia/Taipei",
+        month: "numeric",
+        day: "numeric"
+      }).format(now);
+    }
+
+    function multiplierText(percentInput) {
+      const multiplier = percentInput / 100;
+      if (!isFinite(multiplier)) return "x0";
+      return "x" + multiplier.toFixed(2).replace(/\.?0+$/, "");
+    }
+
+    function makeRows() {
+      const tbody = document.getElementById("rows");
+      tbody.innerHTML = "";
+
+      groups.forEach((group, index) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td class="cellGroup">${group}</td>
+          <td class="cellBase">
+            <input
+              id="base${index}"
+              type="number"
+              inputmode="numeric"
+              placeholder="輸入"
+              oninput="calculate()"
+            >
+          </td>
+          <td class="cellRate">
+            <input
+              id="percentInput${index}"
+              type="number"
+              inputmode="decimal"
+              step="1"
+              placeholder="例150"
+              oninput="calculate()"
+            >
+          </td>
+          <td class="suggest cellSuggest" id="suggest${index}">0</td>
+          <td class="cellActual">
+            <input
+              id="actual${index}"
+              type="number"
+              inputmode="numeric"
+              placeholder="實訂"
+              oninput="calculate()"
+            >
+          </td>
+          <td class="percent cellPercent" id="actualPercent${index}">0%</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function getValue(id) {
+      const value = parseFloat(document.getElementById(id).value);
+      return isNaN(value) ? 0 : value;
+    }
+
+    function calculate() {
+      let suggestTotal = 0;
+      let actualTotal = 0;
+
+      groups.forEach((group, index) => {
+        const base = getValue(`base${index}`);
+        const percentInput = getValue(`percentInput${index}`);
+        const actual = getValue(`actual${index}`);
+
+        const suggest = base * percentInput / 100;
+        const actualPercent = base > 0 ? actual / base * 100 : 0;
+
+        suggestTotal += suggest;
+        actualTotal += actual;
+
+        document.getElementById(`suggest${index}`).textContent = numberFormat(suggest);
+        document.getElementById(`actualPercent${index}`).textContent = percentFormat(actualPercent);
+      });
+
+      document.getElementById("suggestTotal").textContent = numberFormat(suggestTotal);
+      document.getElementById("actualTotal").textContent = numberFormat(actualTotal);
+    }
+
+    async function copyResult() {
+      calculate();
+
+      const storeName = document.getElementById("storeName").value.trim();
+      const today = getTodayTaiwanDate();
+
+      let text = `${today} OC訂購金額\n\n`;
+      text += `店名：${storeName || ""}\n\n`;
+
+      groups.forEach((group, index) => {
+        const base = getValue(`base${index}`);
+        const suggestText = document.getElementById(`suggest${index}`).textContent;
+        const actual = getValue(`actual${index}`);
+        const actualPercentText = document.getElementById(`actualPercent${index}`).textContent;
+
+        const percentInput = getValue(`percentInput${index}`);
+        const multiText = multiplierText(percentInput);
+
+        text += `${group}（係訂/應訂(${multiText})/實訂/%）：\n`;
+        text += `${numberFormat(base)} / ${suggestText} / ${numberFormat(actual)} / ${actualPercentText}\n\n`;
+      });
+
+      text = text.trim();
+
+      const output = document.getElementById("output");
+      output.value = text;
+      output.select();
+
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("已複製結果");
+      } catch (e) {
+        document.execCommand("copy");
+        alert("已產生結果，可手動複製");
+      }
+    }
+
+    function clearAll() {
+      groups.forEach((group, index) => {
+        document.getElementById(`base${index}`).value = "";
+        document.getElementById(`percentInput${index}`).value = "";
+        document.getElementById(`suggest${index}`).textContent = "0";
+        document.getElementById(`actual${index}`).value = "";
+        document.getElementById(`actualPercent${index}`).textContent = "0%";
+      });
+
+      document.getElementById("storeName").value = "";
+      document.getElementById("suggestTotal").textContent = "0";
+      document.getElementById("actualTotal").textContent = "0";
+      document.getElementById("output").value = "";
+    }
+
+    makeRows();
+    calculate();
+  </script>
+</body>
+</html>

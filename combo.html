@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<title>金庫與送金整合工具</title>
+<script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=VmZcp3NgFTbDC-ZqZUQ06MZcMi6I-4Sn9OiFPQOIx3sTqGWRqmSC9mvQx-0ZWCWpYckAR1l4UeOM1MmBFdzvQ96MRgTXV4b122MOR2QL1s_sjBTeRpMQW66qf-eHXxqZfNWCa3FkPI9Da-KzUaCoxn4N4AQkvvObPF2GCODAd0IoaBxLRqUStyHFzdgM69hmW_8hCJTc_Ps1pWtTpIPpBBnlCiddxK8Drpo5MGRb2fmg4DzKWsu5bJwdH-KTETQgJpXGggyQZOvnm5AuCkc-RBiHDtQllUu5RtvkJbS3v00SfIOY6UAuG1YFiBuoLPG3" charset="UTF-8"></script><style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(150deg,#eef6ff,#f8f3ff);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;color:#10233f}
+.top{position:sticky;top:0;z-index:10;padding:8px;background:rgba(255,255,255,.94);border-bottom:1px solid #dbe4ef;backdrop-filter:blur(10px)}
+.nav{display:flex;gap:8px;width:min(980px,100%);margin:auto}
+.nav a{flex:1;padding:11px 8px;border-radius:12px;text-align:center;text-decoration:none;font-weight:800;color:#174ea6;background:#eaf2ff}
+.nav a:last-child{color:#6d28d9;background:#f3ebff}
+main{width:min(100%,1000px);margin:auto;padding:10px 6px 28px}
+.tool{margin:0 0 16px;overflow:hidden;border:1px solid #cbd8e8;border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(30,64,175,.10)}
+.tool-title{margin:0;padding:12px 14px;text-align:center;font-size:20px;color:#fff;background:linear-gradient(125deg,#1d4ed8,#2563eb,#7c3aed)}
+.tool:nth-of-type(2) .tool-title{background:linear-gradient(125deg,#312e81,#7c3aed,#ec4899)}
+.frame-wrap{position:relative;width:100%;background:#fff}
+iframe{display:block;width:100%;height:900px;border:0;background:#fff}
+.loading{position:absolute;inset:0 0 auto 0;z-index:1;padding:18px;text-align:center;color:#64748b;background:#fff}
+.note{margin:8px 10px 0;text-align:center;color:#64748b;font-size:12px}
+.home{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font-weight:800;color:#334155;background:#f1f5f9;border-radius:10px;padding:9px 12px;margin-right:8px}
+@media(max-width:640px){main{padding:6px 3px 22px}.tool{border-radius:13px}.tool-title{font-size:18px;padding:10px}.top{padding:6px}.nav a{padding:10px 5px;font-size:14px}}
+</style>
+</head>
+<body>
+<div class="top">
+  <nav class="nav">
+    <a href="index.html" class="home">首頁</a>
+    <a href="#vault">金庫（上）</a>
+    <a href="#remit">送金（下）</a>
+  </nav>
+</div>
+<main>
+<section class="tool" id="vault"><h1 class="tool-title">金庫金額表</h1><div class="frame-wrap"><div class="loading" id="load-vault">載入中…</div><iframe id="frame-vault" src="vault.html" title="金庫金額表" loading="eager"></iframe></div></section>
+<section class="tool" id="remit"><h1 class="tool-title">送金文字產生器</h1><div class="frame-wrap"><div class="loading" id="load-remit">載入中…</div><iframe id="frame-remit" src="remit.html" title="送金文字產生器" loading="eager"></iframe></div></section>
+<p class="note">金庫在上、送金在下。只有開啟本頁時才會載入這兩個工具。</p>
+</main>
+<script>
+(function(){
+  var frames={vault:document.getElementById('frame-vault'),remit:document.getElementById('frame-remit')};
+  var loaded={vault:false,remit:false};
+  var resizeObservers=[];
+
+  function parseMoney(value){
+    return Number(String(value||'').replace(/,/g,'').replace(/[^\d.-]/g,'')) || 0;
+  }
+
+  function setFrameHeight(frame){
+    try{
+      var doc=frame.contentDocument;
+      if(!doc) return;
+      var body=doc.body, root=doc.documentElement;
+      var h=Math.max(body?body.scrollHeight:0,root?root.scrollHeight:0,body?body.offsetHeight:0,root?root.offsetHeight:0);
+      if(h>250) frame.style.height=(h+4)+'px';
+    }catch(e){}
+  }
+
+  function observeFrame(frame){
+    try{
+      setFrameHeight(frame);
+      var doc=frame.contentDocument;
+      if(!doc || !window.ResizeObserver) return;
+      var ro=new ResizeObserver(function(){ requestAnimationFrame(function(){setFrameHeight(frame);}); });
+      if(doc.documentElement) ro.observe(doc.documentElement);
+      if(doc.body) ro.observe(doc.body);
+      resizeObservers.push(ro);
+    }catch(e){}
+  }
+
+  function updateRemitTodayAmount(remitDoc){
+    try{
+      var expected=remitDoc.getElementById('expectedAmount');
+      var yesterday=remitDoc.getElementById('yesterdayAmount');
+      var today=remitDoc.getElementById('todayAmount');
+      if(!expected||!yesterday||!today) return;
+      today.value=String(Math.max(parseMoney(expected.value)-parseMoney(yesterday.value),0));
+    }catch(e){}
+  }
+
+  function syncVaultToRemit(){
+    if(!loaded.vault||!loaded.remit) return;
+    try{
+      var vaultDoc=frames.vault.contentDocument;
+      var remitDoc=frames.remit.contentDocument;
+      if(!vaultDoc||!remitDoc) return;
+
+      var coinTotals=vaultDoc.querySelectorAll('.coin-row-total');
+      ['coin1','coin5','coin10','coin50'].forEach(function(id,i){
+        var target=remitDoc.getElementById(id);
+        if(target && coinTotals[i]) target.value=String(parseMoney(coinTotals[i].textContent));
+      });
+
+      var noteTotals=vaultDoc.querySelectorAll('.note-row-total');
+      ['bill100','bill500'].forEach(function(id,i){
+        var target=remitDoc.getElementById(id);
+        if(target && noteTotals[i]) target.value=String(parseMoney(noteTotals[i].textContent));
+      });
+
+      var damaged=vaultDoc.querySelector('input[aria-label="損鈔"]');
+      var damagedTarget=remitDoc.getElementById('damagedAmount');
+      if(damaged&&damagedTarget) damagedTarget.value=String(parseMoney(damaged.value));
+
+      var remittance=vaultDoc.querySelector('input[aria-label="金庫應匯額"]');
+      if(remittance){
+        var value=String(parseMoney(remittance.value));
+        var expected=remitDoc.getElementById('expectedAmount');
+        var total=remitDoc.getElementById('totalAmount');
+        if(expected) expected.value=value;
+        if(total) total.value=value;
+      }
+
+      updateRemitTodayAmount(remitDoc);
+      if(frames.remit.contentWindow && typeof frames.remit.contentWindow.generateText==='function'){
+        frames.remit.contentWindow.generateText();
+      }
+    }catch(e){}
+  }
+
+  function scheduleSync(){ requestAnimationFrame(syncVaultToRemit); }
+
+  function bindBridge(){
+    if(!loaded.vault||!loaded.remit) return;
+    try{
+      var vaultDoc=frames.vault.contentDocument;
+      var remitDoc=frames.remit.contentDocument;
+      if(vaultDoc && !vaultDoc.__comboBridgeBound){
+        vaultDoc.__comboBridgeBound=true;
+        var inputs=vaultDoc.querySelectorAll('.coin-vault,.coin-tm2,.note-vault,.note-tm1,input[aria-label="損鈔"],input[aria-label="金庫應匯額"]');
+        inputs.forEach(function(input){
+          ['input','change','blur'].forEach(function(ev){input.addEventListener(ev,scheduleSync);});
+        });
+      }
+      if(remitDoc && !remitDoc.__comboTodayBound){
+        remitDoc.__comboTodayBound=true;
+        ['expectedAmount','yesterdayAmount'].forEach(function(id){
+          var input=remitDoc.getElementById(id);
+          if(!input) return;
+          ['input','change','blur'].forEach(function(ev){
+            input.addEventListener(ev,function(){
+              updateRemitTodayAmount(remitDoc);
+              if(frames.remit.contentWindow && typeof frames.remit.contentWindow.generateText==='function') frames.remit.contentWindow.generateText();
+            });
+          });
+        });
+      }
+      scheduleSync();
+    }catch(e){}
+  }
+
+  Object.keys(frames).forEach(function(name){
+    var frame=frames[name];
+    frame.addEventListener('load',function(){
+      loaded[name]=true;
+      var loading=document.getElementById('load-'+name);
+      if(loading) loading.style.display='none';
+      observeFrame(frame);
+      bindBridge();
+    });
+  });
+
+  window.addEventListener('resize',function(){
+    requestAnimationFrame(function(){setFrameHeight(frames.vault);setFrameHeight(frames.remit);});
+  },{passive:true});
+})();
+</script>
+</body>
+</html>

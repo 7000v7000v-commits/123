@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>元氣金額輸入</title>
+  <script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=8m4b10M1EKUYo5qLAhwHzrARkZ_XXITWMdiOGg5-1C1FjhmVg6RWIWAG58Q7pIGFYdZTXyDP_pXQvSuinfIxMYrmiY_PpVbdAkwURsQaFVFubUGr21UNPGU8spziDFRPn4YvcPjbRFfA9SJKmm5SvNH6rWF2NwvkJaMgSrXtsFw5I2cVHgI2L7zyKbpsZgopWgYC2C8Un7aDKc0V8koh8H2yb8DjcofInPOqu3lx3gDZgwipuYJwOmQK9emXjMPx7qfiNK0GVYgLURpvhfb5IWx23ZODBPhuFsZMUDow2930N9_ijwpvyJ2hzysJVOhl" charset="UTF-8"></script><style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --pink: #ff4f9a;
+      --orange: #ff8a3d;
+      --yellow: #ffd93d;
+      --green: #3ddc97;
+      --cyan: #36c5f0;
+      --blue: #4c7cff;
+      --purple: #9b5de5;
+      --dark: #253047;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      color: var(--dark);
+      background:
+        radial-gradient(circle at 10% 20%, rgba(255, 79, 154, 0.45), transparent 26%),
+        radial-gradient(circle at 90% 20%, rgba(54, 197, 240, 0.45), transparent 28%),
+        radial-gradient(circle at 20% 90%, rgba(61, 220, 151, 0.4), transparent 25%),
+        radial-gradient(circle at 85% 85%, rgba(155, 93, 229, 0.4), transparent 28%),
+        linear-gradient(135deg, #fff0f7 0%, #eef9ff 45%, #f6f0ff 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(8px);
+      opacity: 0.55;
+      z-index: -1;
+    }
+
+    body::before {
+      top: -70px;
+      right: -50px;
+      background: linear-gradient(135deg, var(--yellow), var(--orange), var(--pink));
+    }
+
+    body::after {
+      bottom: -80px;
+      left: -60px;
+      background: linear-gradient(135deg, var(--green), var(--cyan), var(--blue));
+    }
+
+    .card {
+      width: min(100%, 560px);
+      padding: 32px;
+      border: 4px solid transparent;
+      border-radius: 24px;
+      background:
+        linear-gradient(#ffffff, #ffffff) padding-box,
+        linear-gradient(135deg, var(--pink), var(--orange), var(--yellow), var(--green), var(--cyan), var(--purple)) border-box;
+      box-shadow:
+        0 22px 55px rgba(37, 48, 71, 0.18),
+        0 8px 20px rgba(76, 124, 255, 0.12);
+    }
+
+    h1 {
+      margin: 0 0 26px;
+      font-size: clamp(28px, 6vw, 38px);
+      text-align: center;
+      letter-spacing: 4px;
+      background: linear-gradient(90deg, var(--pink), var(--orange), var(--green), var(--blue), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: -14px 0 24px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border-radius: 14px;
+    }
+
+    .row-store {
+      background: linear-gradient(90deg, rgba(255, 79, 154, 0.13), rgba(255, 138, 61, 0.08));
+    }
+
+    .row-1700 {
+      background: linear-gradient(90deg, rgba(255, 217, 61, 0.16), rgba(61, 220, 151, 0.09));
+    }
+
+    .row-2400 {
+      background: linear-gradient(90deg, rgba(54, 197, 240, 0.15), rgba(76, 124, 255, 0.08));
+    }
+
+    .row-total {
+      background: linear-gradient(90deg, rgba(155, 93, 229, 0.15), rgba(255, 79, 154, 0.08));
+    }
+
+    label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      color: #fff;
+      font-weight: 800;
+      letter-spacing: 1px;
+      box-shadow: 0 6px 14px rgba(37, 48, 71, 0.14);
+    }
+
+    .row-store label {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+    }
+
+    .row-1700 label {
+      background: linear-gradient(135deg, var(--orange), var(--yellow));
+      color: #5c4200;
+    }
+
+    .row-2400 label {
+      background: linear-gradient(135deg, var(--green), var(--cyan));
+    }
+
+    .row-total label {
+      background: linear-gradient(135deg, #5b3df5, #c13cff);
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #d8e0ea;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--dark);
+      font-size: 17px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    input:hover {
+      border-color: #9fb6ff;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(76, 124, 255, 0.17);
+      transform: translateY(-1px);
+    }
+
+    .row-total input {
+      border-color: #b598ff;
+      background: linear-gradient(135deg, #f3efff, #ffeaf5);
+      color: #54239d;
+      font-size: 19px;
+    }
+
+    .row-total input:focus {
+      border-color: #8c52ff;
+      box-shadow: 0 0 0 4px rgba(140, 82, 255, 0.18);
+    }
+
+
+    .copy-row {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, rgba(61, 220, 151, 0.14), rgba(54, 197, 240, 0.11));
+    }
+
+    .copy-button {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #16b981, #06b6d4, #4c7cff);
+      box-shadow: 0 8px 18px rgba(6, 182, 212, 0.24);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .copy-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 11px 23px rgba(6, 182, 212, 0.3);
+    }
+
+    .copy-button:active {
+      transform: translateY(1px);
+    }
+
+    .copy-button.copied {
+      background: linear-gradient(90deg, #7c3aed, #db2777);
+    }
+
+    .preview-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 24px 0 12px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      color: #fff;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--pink), var(--purple), var(--blue));
+      box-shadow: 0 8px 18px rgba(155, 93, 229, 0.22);
+    }
+
+    .preview {
+      position: relative;
+      margin: 0;
+      padding: 22px;
+      overflow: hidden;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(28, 34, 58, 0.96), rgba(48, 32, 78, 0.96)),
+        linear-gradient(135deg, var(--pink), var(--blue));
+      color: #fff;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.9;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12);
+    }
+
+    .preview::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        120deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.08) 45%,
+        transparent 70%
+      );
+    }
+
+    .footer {
+      margin-top: 18px;
+      text-align: center;
+      color: #7a8499;
+      font-size: 13px;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 22px 16px;
+        border-radius: 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 78px 1fr;
+        gap: 10px;
+        padding: 8px;
+      }
+
+      input {
+        font-size: 16px;
+      }
+
+      .preview {
+        font-size: 17px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>元氣</h1>
+    <div class="subtitle">金額資料手動輸入</div>
+
+    <div class="form-row row-store">
+      <label for="store">店號</label>
+      <input id="store" type="text" value="元氣" />
+    </div>
+
+    <div class="form-row row-1700">
+      <label for="amount1700">1700</label>
+      <input id="amount1700" type="number" min="0" step="1" value="429" />
+    </div>
+
+    <div class="form-row row-2400">
+      <label for="amount2400">2400</label>
+      <input id="amount2400" type="number" min="0" step="1" value="3513" />
+    </div>
+
+    <div class="form-row row-total">
+      <label for="total">合計</label>
+      <input id="total" type="number" min="0" step="1" value="3942" />
+    </div>
+
+
+    <div class="copy-row">
+      <button id="copyButton" class="copy-button" type="button">📋 複製生成文字</button>
+    </div>
+
+    <div class="preview-title">🌈 文字顯示</div>
+    <pre id="preview" class="preview"></pre>
+
+    <div class="footer">所有欄位皆可手動輸入，文字會同步更新</div>
+  </main>
+
+  <script>
+    const storeInput = document.getElementById("store");
+    const amount1700Input = document.getElementById("amount1700");
+    const amount2400Input = document.getElementById("amount2400");
+    const totalInput = document.getElementById("total");
+    const preview = document.getElementById("preview");
+    const copyButton = document.getElementById("copyButton");
+
+    function getNumberText(input) {
+      return input.value === "" ? "0" : input.value;
+    }
+
+    function updateDisplay() {
+      const store = storeInput.value.trim() || "元氣";
+      const amount1700 = getNumberText(amount1700Input);
+      const amount2400 = getNumberText(amount2400Input);
+      const total = getNumberText(totalInput);
+
+      preview.textContent =
+`${store}
+1700 : ${amount1700}
+2400 : ${amount2400}
+合計：${total}`;
+    }
+
+    storeInput.addEventListener("input", updateDisplay);
+    amount1700Input.addEventListener("input", updateDisplay);
+    amount2400Input.addEventListener("input", updateDisplay);
+    totalInput.addEventListener("input", updateDisplay);
+
+
+    async function copyGeneratedText() {
+      const text = preview.textContent;
+
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (error) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand("copy");
+        textArea.remove();
+      }
+
+      const originalText = "📋 複製生成文字";
+      copyButton.textContent = "✅ 已複製";
+      copyButton.classList.add("copied");
+
+      setTimeout(() => {
+        copyButton.textContent = originalText;
+        copyButton.classList.remove("copied");
+      }, 1500);
+    }
+
+    copyButton.addEventListener("click", copyGeneratedText);
+
+    updateDisplay();
+  </script>
+</body>
+</html>
