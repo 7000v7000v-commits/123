@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1d4ed8">
 <title>金庫與送金整合工具</title>
-<script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=VmZcp3NgFTbDC-ZqZUQ06MZcMi6I-4Sn9OiFPQOIx3sTqGWRqmSC9mvQx-0ZWCWpYckAR1l4UeOM1MmBFdzvQ96MRgTXV4b122MOR2QL1s_sjBTeRpMQW66qf-eHXxqZfNWCa3FkPI9Da-KzUaCoxn4N4AQkvvObPF2GCODAd0IoaBxLRqUStyHFzdgM69hmW_8hCJTc_Ps1pWtTpIPpBBnlCiddxK8Drpo5MGRb2fmg4DzKWsu5bJwdH-KTETQgJpXGggyQZOvnm5AuCkc-RBiHDtQllUu5RtvkJbS3v00SfIOY6UAuG1YFiBuoLPG3" charset="UTF-8"></script><style>
+<script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=CX3H2b6mZrD3itZWivOZxCcsEq18FOxbs4dECIkJzJXp9VspOcFSN_ZuW1EZuPxkZjNx2MTmtYVEW2j0kpiQU7XfNHrZAXu9O5U4UXpC0dMJc8yg7lP5i89i_OxhCWHUFXJw64UEqDOLabVqe-3_fjjklE7SSmPbYvs0sgrOJGXHmnjHLhyrLguxjcObETJeZaCcLcCNoYHtOI_bmTsDZaJl-yLRHuFzDgVlAsDm1IVCsWeJi_LYHKDZUR5lFT96lq2_tcpvOhJFElBOvUuTdcY2YsBJfibKB_Vbi647t_W-o8J1nPPOWONViJU2AzE8" charset="UTF-8"></script><style>
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:auto}
 body{margin:0;background:linear-gradient(150deg,#eef6ff,#f8f3ff);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;color:#10233f}
 .top{position:sticky;top:0;z-index:10;padding:8px;background:rgba(255,255,255,.94);border-bottom:1px solid #dbe4ef;backdrop-filter:blur(10px)}
 .nav{display:flex;gap:8px;width:min(980px,100%);margin:auto}
 .nav a{flex:1;padding:11px 8px;border-radius:12px;text-align:center;text-decoration:none;font-weight:800;color:#174ea6;background:#eaf2ff}
 .nav a:last-child{color:#6d28d9;background:#f3ebff}
 main{width:min(100%,1000px);margin:auto;padding:10px 6px 28px}
-.tool{margin:0 0 16px;overflow:hidden;border:1px solid #cbd8e8;border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(30,64,175,.10)}
+.tool{scroll-margin-top:72px;margin:0 0 16px;overflow:hidden;border:1px solid #cbd8e8;border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(30,64,175,.10)}
 .tool-title{margin:0;padding:12px 14px;text-align:center;font-size:20px;color:#fff;background:linear-gradient(125deg,#1d4ed8,#2563eb,#7c3aed)}
 .tool:nth-of-type(2) .tool-title{background:linear-gradient(125deg,#312e81,#7c3aed,#ec4899)}
 .frame-wrap{position:relative;width:100%;background:#fff}
@@ -29,8 +29,8 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
 <div class="top">
   <nav class="nav">
     <a href="index.html" class="home">首頁</a>
-    <a href="#vault">金庫（上）</a>
-    <a href="#remit">送金（下）</a>
+    <a href="#vault" data-jump="vault">金庫（上）</a>
+    <a href="#remit" data-jump="remit">送金（下）</a>
   </nav>
 </div>
 <main>
@@ -150,6 +150,38 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
     }catch(e){}
   }
 
+  var jumpTimers=[];
+  function clearJumpTimers(){
+    jumpTimers.forEach(function(t){clearTimeout(t);});
+    jumpTimers=[];
+  }
+
+  function jumpToSection(name, updateHash){
+    var target=document.getElementById(name);
+    var topbar=document.querySelector('.top');
+    if(!target) return;
+    function place(){
+      var offset=(topbar ? topbar.offsetHeight : 0) + 6;
+      var y=target.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo(0, Math.max(0,y));
+    }
+    clearJumpTimers();
+    place();
+    [80,220,500,1000,1800].forEach(function(delay){
+      jumpTimers.push(setTimeout(place,delay));
+    });
+    if(updateHash && history.replaceState){
+      history.replaceState(null,'','#'+name);
+    }
+  }
+
+  document.querySelectorAll('[data-jump]').forEach(function(link){
+    link.addEventListener('click',function(e){
+      e.preventDefault();
+      jumpToSection(link.getAttribute('data-jump'),true);
+    });
+  });
+
   Object.keys(frames).forEach(function(name){
     var frame=frames[name];
     frame.addEventListener('load',function(){
@@ -158,8 +190,13 @@ iframe{display:block;width:100%;height:900px;border:0;background:#fff}
       if(loading) loading.style.display='none';
       observeFrame(frame);
       bindBridge();
+      if(location.hash==='#'+name) jumpToSection(name,false);
     });
   });
+
+  if(location.hash==='#vault' || location.hash==='#remit'){
+    setTimeout(function(){jumpToSection(location.hash.slice(1),false);},0);
+  }
 
   window.addEventListener('resize',function(){
     requestAnimationFrame(function(){setFrameHeight(frames.vault);setFrameHeight(frames.remit);});
